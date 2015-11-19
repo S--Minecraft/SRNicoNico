@@ -200,6 +200,7 @@
     </ApplicationDefinition>
     <Compile Include="DynamicJson.cs" />
     <Compile Include="Models\NicoNicoViewer\HyperLinkParser.cs" />
+    <Compile Include="Models\NicoNicoViewer\LiveData.cs" />
     <Compile Include="Models\NicoNicoViewer\NicoNicoOpener.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoFavorite.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoLive.cs" />
@@ -216,6 +217,11 @@
     <Compile Include="ViewModels\Config\ConfigViewModel.cs" />
     <Compile Include="ViewModels\Favorite\FavoriteUserViewModel.cs" />
     <Compile Include="ViewModels\Favorite\FavoriteViewModel.cs" />
+    <Compile Include="ViewModels\Live\LiveDataViewModel.cs" />
+    <Compile Include="ViewModels\Live\LiveViewModel.cs" />
+    <Compile Include="Views\Contents\Live\Live.xaml.cs">
+      <DependentUpon>Live.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\Log\AccessLogEntryViewModel.cs" />
     <Compile Include="ViewModels\Log\AccessLogViewModel.cs" />
     <Compile Include="ViewModels\History\HistoryViewModel.cs" />
@@ -259,6 +265,9 @@
     </Compile>
     <Compile Include="Views\Contents\Favorite\FavoriteUser.xaml.cs">
       <DependentUpon>FavoriteUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Contents\Live\LiveInfo.xaml.cs">
+      <DependentUpon>LiveInfo.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contents\Log\AccessLog.xaml.cs">
       <DependentUpon>AccessLog.xaml</DependentUpon>
@@ -427,6 +436,10 @@
     <Compile Include="Views\StatusBar.xaml.cs">
       <DependentUpon>StatusBar.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\Contents\Live\Live.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Contents\Config\Config.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -454,6 +467,10 @@
     <Page Include="Views\Contents\Favorite\FavoriteUser.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Contents\Live\LiveInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Contents\Log\AccessLog.xaml">
       <SubType>Designer</SubType>
