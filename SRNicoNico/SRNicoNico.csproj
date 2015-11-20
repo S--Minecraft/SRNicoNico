@@ -222,6 +222,9 @@
     <Compile Include="Views\Contents\Live\Live.xaml.cs">
       <DependentUpon>Live.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\Reservation\ReservationResultEntryViewModel.cs" />
+    <Compile Include="ViewModels\Reservation\ReservationResultViewModel.cs" />
+    <Compile Include="ViewModels\Reservation\ReservationViewModel.cs" />
     <Compile Include="ViewModels\Log\AccessLogEntryViewModel.cs" />
     <Compile Include="ViewModels\Log\AccessLogViewModel.cs" />
     <Compile Include="ViewModels\History\HistoryViewModel.cs" />
@@ -313,6 +316,12 @@
     </Compile>
     <Compile Include="Views\Contents\Log\AccessLogDialog.xaml.cs">
       <DependentUpon>AccessLogDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Contents\Reservation\ReservationResult.xaml.cs">
+      <DependentUpon>ReservationResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Contents\Reservation\ReservationResultEntry.xaml.cs">
+      <DependentUpon>ReservationResultEntry.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contents\SignIn\TwitterSignInDialog.xaml.cs">
       <DependentUpon>TwitterSignInDialog.xaml</DependentUpon>
@@ -529,6 +538,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Contents\Log\AccessLogDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Contents\Reservation\ReservationResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Contents\Reservation\ReservationResultEntry.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

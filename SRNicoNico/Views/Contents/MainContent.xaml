@@ -15,6 +15,7 @@
              xmlns:nicorepo="clr-namespace:SRNicoNico.Views.Contents.NicoRepo"
              xmlns:history="clr-namespace:SRNicoNico.Views.Contents.History"
              xmlns:mylist="clr-namespace:SRNicoNico.Views.Contents.Mylist"
+             xmlns:reservation="clr-namespace:SRNicoNico.Views.Contents.Reservation"
              xmlns:config="clr-namespace:SRNicoNico.Views.Contents.Config"
              xmlns:user="clr-namespace:SRNicoNico.Views.Contents.User"
              xmlns:vm="clr-namespace:SRNicoNico.ViewModels"
@@ -48,6 +49,9 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:NicoRepoViewModel}">
                     <nicorepo:NicoRepo />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ReservationViewModel}">
+                    <reservation:ReservationResult />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:OtherViewModel}">
                     <misc:Other />

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SRNicoNico.Models.NicoNicoViewer
 {
-    class LiveData : NotificationObject
+    public class LiveData : NotificationObject
     {
 
         //LiveAPIデータ
