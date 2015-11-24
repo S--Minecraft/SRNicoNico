@@ -208,6 +208,7 @@
     <Compile Include="Models\NicoNicoWrapper\NicoNicoMylist.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoMylistGroup.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoVitaApi.cs" />
+    <Compile Include="Models\NicoNicoWrapper\NicoNicoVitaLiveApi.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoVitaMylistApi.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoVitaUserApi.cs" />
     <Compile Include="Models\NicoNicoWrapper\RequestTimeout.cs" />

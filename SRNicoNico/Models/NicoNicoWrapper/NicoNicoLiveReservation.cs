@@ -35,6 +35,13 @@ namespace SRNicoNico.Models.NicoNicoWrapper
             var response = json.nicolive_video_response.timeshift_reserved_detail_list;
 
             List<NicoNicoLiveReservationData> ret = new List<NicoNicoLiveReservationData>();
+
+            List<string> lives = new List<string>();
+            foreach(var entry in response.reserved_item)
+            {
+                lives.Add("lv" + entry.vid);
+            }
+            Dictionary<string, NicoNicoVitaApiLiveData> vitaLives = NicoNicoVitaLiveApi.GetLiveArrayData(lives);
             
             foreach(var entry in response.reserved_item)
             {
@@ -65,8 +72,15 @@ namespace SRNicoNico.Models.NicoNicoWrapper
                     data.ExpireDate = NicoNicoUtil.GetTimeFromLong(long.Parse(entry.expire));
                 }
 
+                if (vitaLives.ContainsKey(data.Id))
+                {
+                    data.Data = vitaLives[data.Id];
+                }
+
                 ret.Add(data);
             }
+
+            
 
             Reservation.Status = "生放送予約リスト取得完了";
 
@@ -90,5 +104,8 @@ namespace SRNicoNico.Models.NicoNicoWrapper
 
         //期限切れ日時 UnixTime
         public string ExpireDate { get; set; }
+
+        //詳細情報
+        public NicoNicoVitaApiLiveData Data { get; set; }
     }
 }
