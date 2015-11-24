@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SRNicoNico.ViewModels.Live
+namespace SRNicoNico.Views.Contents.Live
 {
     /// <summary>
     /// Live.xaml の相互作用ロジック

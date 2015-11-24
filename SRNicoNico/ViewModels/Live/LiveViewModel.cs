@@ -13,7 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace SRNicoNico.LiveModels
+namespace SRNicoNico.ViewModels
 {
 
     public class LiveViewModel : TabItemViewModel

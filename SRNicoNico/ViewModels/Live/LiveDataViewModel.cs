@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SRNicoNico.ViewModels.Live
+namespace SRNicoNico.ViewModels
 {
     class LiveDataViewModel : ViewModel {
 
