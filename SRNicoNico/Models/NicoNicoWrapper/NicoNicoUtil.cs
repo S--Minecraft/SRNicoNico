@@ -60,6 +60,11 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
 
 			return munites + ":" + seconds;
 		}
+
+        public static string DateFromUnixTime(long time) {
+            DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(time).ToLocalTime();
+            return dateTime.Year + "-" + dateTime.Month + "-" + dateTime.Day + " " + dateTime.Hour + ":" + dateTime.Minute + ":" + dateTime.Second;
+        }
         
         public static string DateFromVitaFormatDate(string date) {
             return Regex.Replace(date, @"(\d\d\d\d-\d\d-\d\d).(\d\d:\d\d:\d\d).\d\d:\d\d", "$1 $2");

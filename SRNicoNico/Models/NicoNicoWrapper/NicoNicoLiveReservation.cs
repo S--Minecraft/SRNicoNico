@@ -65,7 +65,7 @@ namespace SRNicoNico.Models.NicoNicoWrapper
 
                 if (entry.expire != "0")
                 {
-                    data.ExpireDate = NicoNicoUtil.GetTimeFromLong(long.Parse(entry.expire));
+                    data.ExpireDate = NicoNicoUtil.DateFromUnixTime(long.Parse(entry.expire));
                 } else
                 {
                     data.ExpireDate = "";
