@@ -13,6 +13,19 @@
              Foreground="{DynamicResource ActiveForegroundBrushKey}"
              Background="Transparent"
              >
+    <UserControl.Resources>
+        <Style x:Key="HideEmptyStyle" TargetType="TextBlock">
+            <Style.Triggers>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
@@ -26,14 +39,14 @@
 
         <UniformGrid Grid.Column="1" Columns="2" Margin="10,22,0,0">
 
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.Id, StringFormat=生放送ID:{0}}"  />
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.State, StringFormat=状態:{0}}"  />
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.Data.ChannelId, StringFormat=コミュニティID:{0}}"  />
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.Data.ChannelName, StringFormat=コミュニティ名:{0}}"  />
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.Data.ViewCount, StringFormat=再生数:{0:N0}}"/>
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.Data.CommentCount, StringFormat=コメント数:{0:N0}}"/>
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.Data.StartTime, StringFormat=開始日時:{0}}"/>
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Text="{Binding Data.ExpireDate, StringFormat=期限切れ日時:{0}}"/>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.Id, StringFormat=生放送ID:{0}}"  />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.State, StringFormat=状態:{0}}"  />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.Data.ChannelId, StringFormat=コミュニティID:{0}}"  />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.Data.ChannelName, StringFormat=コミュニティ名:{0}}"  />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.Data.ViewCount, StringFormat=再生数:{0:N0}}"/>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.Data.CommentCount, StringFormat=コメント数:{0:N0}}"/>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.Data.StartTime, StringFormat=開始日時:{0}}"/>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Style="{StaticResource HideEmptyStyle}" Text="{Binding Data.ExpireDate, StringFormat=期限切れ日時:{0}}"/>
 
         </UniformGrid>
 
