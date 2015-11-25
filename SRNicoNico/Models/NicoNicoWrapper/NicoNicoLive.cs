@@ -30,30 +30,30 @@ namespace SRNicoNico.Models.NicoNicoWrapper
 
                 ret.User = ParseUserData(response.user);
 
-                ret.RTMPIsFms = response.rtmp.is_fms;
-                ret.RTMPPort = response.rtmp.rtmpt_port;
+                ret.RTMPIsFms = (response.rtmp.is_fms == "1");
+                ret.RTMPPort = int.Parse(response.rtmp.rtmpt_port);
                 ret.RTMPUrl = response.rtmp.url;
                 ret.RTMPTicket = response.rtmp.ticket;
 
                 ret.MSAddr = response.ms.addr;
-                ret.MSPort = response.ms.port;
-                ret.MSThread = response.ms.thread;
+                ret.MSPort = int.Parse(response.ms.port);
+                ret.MSThread = int.Parse(response.ms.thread);
 
                 ret.TidList = response.tid_list;
 
-                ret.TwitterIsLiveEnabled = response.twitter.live_enabled;
-                ret.TwitterVipModeCount = response.twitter.vip_mode_count;
+                ret.TwitterIsLiveEnabled = (response.twitter.live_enabled == "1");
+                ret.TwitterVipModeCount = int.Parse(response.twitter.vip_mode_count);
                 ret.TwitterLiveApiUrl = response.twitter.live_api_url;
 
-                ret.PlayerQOSAnalytics = response.player.qos_analytics;
+                ret.PlayerQOSAnalytics = int.Parse(response.player.qos_analytics);
                 ret.PlayerDialogOidashiUrl = response.player.dialog_image.oidashi;
-                ret.PlayerIsNoticeViewerBalloonEnbled = response.player.is_notice_viewer_ballon_enabled;
+                ret.PlayerIsNoticeViewerBalloonEnbled = (response.player.is_notice_viewer_ballon_enabled == "1");
                 ret.PlayerErrorReport = response.player.error_report;
 
                 ret.MarqueeCategory = response.marquee.category;
                 ret.MarqueeGameKey = response.marquee.game_key;
                 ret.MarqueeGameTime = response.marquee.game_time;
-                ret.MarqueeIsForceNicowariOff = response.marquee.force_nicowari_off;
+                ret.MarqueeIsForceNicowariOff = (response.marquee.force_nicowari_off == "1");
             }
             else
             {
@@ -72,59 +72,59 @@ namespace SRNicoNico.Models.NicoNicoWrapper
             ret.Description = res.description;
             ret.ProviderType = res.provider_type;
             ret.DefaultCommunity = res.default_community;
-            ret.International = res.international;
-            ret.IsOwner = res.is_owner;
+            ret.International = int.Parse(res.international);
+            ret.IsOwner = (res.is_owner == "1");
             ret.OwnerId = res.owner_id;
             ret.OwnerName = res.owner_name;
-            ret.IsReserved = res.is_reserved;
-            ret.IsNicoNicoEnqueteEnbled = res.is_niconico_enquete_enabled;
-            ret.WatchCount = res.watch_count;
-            ret.CommentCount = res.comment_count;
-            ret.BaseTime = res.base_time;
-            ret.OpenTime = res.open_time;
-            ret.StartTime = res.start_time;
-            ret.EndTime = res.end_time;
-            //ret.HqStream = res.title;
-            ret.IsRerunStream = res.is_rerun_stream;
-            //ret.IsArchivePlayServer = res.title;
+            ret.IsReserved = (res.is_reserved == "1");
+            ret.IsNicoNicoEnqueteEnbled = (res.is_niconico_enquete_enabled == "1");
+            ret.WatchCount = int.Parse(res.watch_count);
+            ret.CommentCount = int.Parse(res.comment_count);
+            ret.BaseTime = NicoNicoUtil.DateFromUnixTime(long.Parse(res.base_time));
+            ret.OpenTime = NicoNicoUtil.DateFromUnixTime(long.Parse(res.open_time));
+            ret.StartTime = NicoNicoUtil.DateFromUnixTime(long.Parse(res.start_time));
+            ret.EndTime = NicoNicoUtil.DateFromUnixTime(res.end_time);
+            //ret.HqStream = int.Parse(res.title);
+            ret.IsRerunStream = (res.is_rerun_stream == "1");
+            //ret.IsArchivePlayServer = (res.title == "1");
             ret.BourbonUrl = res.bourbon_url;
             ret.FullVideo = res.full_video;
             ret.AfterVideo = res.after_video;
             ret.BeforeVideo = res.before_video;
             ret.KickoutVideo = res.kickout_video;
             ret.TwitterTag = res.twitter_tag;
-            ret.DanjoCommentMode = res.danjo_comment_mode;
+            ret.DanjoCommentMode = int.Parse(res.danjo_comment_mode);
             //ret.Aspect  = res.title;
-            ret.InfinityMode = res.infinity_mode;
-            ret.Archive = res.archive;
-            ret.PressDisplayLines = res.press.display_lines;
-            ret.PressDisplayTime = res.press.display_time;
+            ret.InfinityMode = int.Parse(res.infinity_mode);
+            ret.Archive = (res.archive == "1");
+            ret.PressDisplayLines = int.Parse(res.press.display_lines);
+            ret.PressDisplayTime = int.Parse(res.press.display_time);
             ret.PressStyleConf = res.press.style_conf;
             ret.PluginDelay = res.plugin_delay;
             ret.PluginUrl = res.plugin_url;
             ret.PluginUrls = res.plugin_urls;
-            ret.AllowNetduetto = res.allow_netduetto;
+            ret.AllowNetduetto = (res.allow_netduetto == "1");
             ret.NdToken = res.nd_token;
-            ret.NgScoring = res.ng_scoring;
-            ret.IsNonArchiveTimeShiftEnbled = res.is_nonarchive_timeshift_enabled;
-            ret.IsTimeShiftReserved = res.is_timeshift_reserved;
-            ret.HeaderComment = res.header_comment;
-            ret.FooterComment = res.footer_comment;
-            ret.SplitBottom = res.split_bottom;
-            ret.SplitTop = res.split_top;
-            ret.BackgroundComment = res.background_comment;
-            ret.FontScale = res.font_scale;
-            ret.CommentLock = res.comment_lock;
-            ret.Telop = res.telop.enable;
+            ret.NgScoring = int.Parse(res.ng_scoring);
+            ret.IsNonArchiveTimeShiftEnbled = (res.is_nonarchive_timeshift_enabled == "1");
+            ret.IsTimeShiftReserved = (res.is_timeshift_reserved == "1");
+            ret.HeaderComment = int.Parse(res.header_comment);
+            ret.FooterComment = int.Parse(res.footer_comment);
+            ret.SplitBottom = int.Parse(res.split_bottom);
+            ret.SplitTop = int.Parse(res.split_top);
+            ret.BackgroundComment = int.Parse(res.background_comment);
+            ret.FontScale = int.Parse(res.font_scale);
+            ret.CommentLock = (res.comment_lock == "1");
+            ret.Telop = (res.telop.enable == "1");
 
             List<NicoNicoLiveContent> contents = new List<NicoNicoLiveContent>();
             foreach (var content in res.contents_list)
             {
                 NicoNicoLiveContent r = new NicoNicoLiveContent();
 
-                r.Id = content.id;
-                r.DisableAudio = content.disableAudio;
-                r.DisableVideo = content.disableVideo;
+                r.Id = int.Parse(content.id);
+                r.DisableAudio = (content.disableAudio == "1");
+                r.DisableVideo = (content.disableVideo == "1");
                 r.StartTime = content.start_time;
                 r.Url = content;
 
@@ -141,7 +141,7 @@ namespace SRNicoNico.Models.NicoNicoWrapper
             */
             ret.PictureUrl = res.picture_url;
             ret.ThumbUrl = res.thumb_url;
-            ret.IsPriotityPrefecture = res.is_priority_prefecture;
+            ret.IsPriotityPrefecture = (res.is_priority_prefecture == "1");
 
             return ret;
         }
@@ -152,21 +152,21 @@ namespace SRNicoNico.Models.NicoNicoWrapper
 
             ret.Id = res.user_id;
             ret.Name = res.nickname;
-            ret.IsPremium = res.is_premium;
-            ret.Age = res.userAge;
-            ret.Sex = res.userSex;
+            ret.IsPremium = (res.is_premium =="1");
+            ret.Age = int.Parse(res.userAge);
+            ret.Sex = int.Parse(res.userSex);
             ret.Domain = res.userDomain;
-            ret.Prefecture = res.userPrefecture;
+            ret.Prefecture = int.Parse(res.userPrefecture);
             ret.Language = res.userLanguage;
             ret.RoomLabel = res.room_label;
             ret.SeetNo = res.room_seetno;
-            ret.IsJoin = res.is_join;
+            ret.IsJoin = (res.is_join == "1");
             ret.TwitterStatus = res.twitter.status;
             ret.TwitterScreenName = res.twitter.screen_name;
-            ret.TwitterFollowersCount = res.twitter.followers_count;
-            ret.TwitterIsVip = res.twitter.is_vip;
+            ret.TwitterFollowersCount = int.Parse(res.twitter.followers_count);
+            ret.TwitterIsVip = (res.twitter.is_vip == "1");
             ret.TwitterProfileImgUrl = res.twitter.profile_image_url;
-            ret.TwitterAfterAuth = res.twitter.after_auth;
+            ret.TwitterAfterAuth = int.Parse(res.twitter.after_auth);
             ret.TwitterToken = res.twitter.tweet_token;
 
             return ret;
