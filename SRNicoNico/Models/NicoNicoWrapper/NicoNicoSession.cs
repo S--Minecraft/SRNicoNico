@@ -36,7 +36,7 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
 	public class NicoNicoSession : NotificationObject {
 
 		//サインインURL
-		private const string SignInURL = "https://account.nicovideo.jp/login?site=niconico";
+		private const string SignInURL = "https://secure.nicovideo.jp/secure/login?site=niconico";
 
         //アカウント権限
         private const string UserAgent = "SRNicoNico/1.0";
@@ -190,10 +190,8 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
 		//セッションを確立した後に呼ぶ
 		public SigninStatus SignInInternal() {
 
-
 			//ニコニコTOPにレスポンスヘッダを要求する
 			HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Head, NicoNicoTop);
-
 
 			HttpResponseMessage response = HttpClient.SendAsync(message).Result;
 

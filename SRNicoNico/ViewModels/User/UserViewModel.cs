@@ -14,6 +14,7 @@ using Livet.Messaging.Windows;
 using SRNicoNico.Models.NicoNicoWrapper;
 using System.Threading.Tasks;
 using SRNicoNico.Models.NicoNicoViewer;
+using System.Windows.Input;
 
 namespace SRNicoNico.ViewModels {
     public class UserViewModel : TabItemViewModel {
@@ -65,152 +66,66 @@ namespace SRNicoNico.ViewModels {
         }
         #endregion
 
+        private readonly string UserPageUrl;
 
         public UserViewModel(string url) : base("読込中") {
 
-
+            UserPageUrl = url;
             App.ViewModelRoot.TabItems.Add(this);
             App.ViewModelRoot.SelectedTab = this;
-            UserInstance = new NicoNicoUser(this, url);
 
+            Initialize();
+        }
+
+        public void Initialize() {
+
+            UserInstance = new NicoNicoUser(this, UserPageUrl);
             UserEntry = UserInstance.GetUserInfo();
             Name = UserEntry.UserName;
 
             UserContentList = new DispatcherCollection<TabItemViewModel>(DispatcherHelper.UIDispatcher) {
 
                 new UserNicoRepoViewModel(this),
-                new UserMylistViewModel(),
-                new UserVideoViewModel()
+                new UserMylistViewModel(this),
+                new UserVideoViewModel(this)
             };
-
         }
 
         public void OpenBrowser() {
 
-            System.Diagnostics.Process.Start(UserEntry.UserPage);
+            System.Diagnostics.Process.Start(UserPageUrl);
         }
 
         public void Close() {
 
             App.ViewModelRoot.TabItems.Remove(this);
         }
-    }
 
-    class UserNicoRepoViewModel : TabItemViewModel {
-
-
-        #region UserNicoRepoList変更通知プロパティ
-        private DispatcherCollection<NicoRepoResultEntryViewModel> _UserNicoRepoList;
-
-        public DispatcherCollection<NicoRepoResultEntryViewModel> UserNicoRepoList {
-            get { return _UserNicoRepoList; }
-            set { 
-                if(_UserNicoRepoList == value)
-                    return;
-                _UserNicoRepoList = value;
-                RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-
-        #region SelectedItem変更通知プロパティ
-        private NicoRepoResultEntryViewModel _SelectedItem;
-
-        public NicoRepoResultEntryViewModel SelectedItem {
-            get { return _SelectedItem; }
-            set { 
-                if(_SelectedItem == value)
-                    return;
-                _SelectedItem = value;
-                RaisePropertyChanged();
-            }
-        }
-        #endregion
-
-        //OwnerViewModel
-        private UserViewModel User;
-
-        //ニコレポを全て取得し終わったら
-        private bool IsEnd = false;
-
-        public UserNicoRepoViewModel(UserViewModel user) : base("ニコレポ") {
-
-            User = user;
-            IsActive = true;
-            UserNicoRepoList = new DispatcherCollection<NicoRepoResultEntryViewModel>(DispatcherHelper.UIDispatcher);
+        public void Reflesh() {
 
             Task.Run(() => {
 
-                var timeline = User.UserInstance.GetUserNicoRepo();
-
-                if(timeline == null) {
-
-                    IsActive = false;
-                    return;
-                }
-                foreach(var entry in timeline) {
-
-                    UserNicoRepoList.Add(new NicoRepoResultEntryViewModel(entry));
-                }
-
-                IsActive = false;
+                Close();
+                new UserViewModel(UserPageUrl);
             });
+
         }
 
-        //インフィニットスクロール発動で呼ばれる
-        public void Next() {
+        public override void KeyDown(KeyEventArgs e) {
+    
 
-            if(IsEnd) {
+            if(e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.W) {
 
-                return;
-            }
-            IsActive = true;
+                Close();
+            } else if(e.Key == Key.F5) {
 
-            Task.Run(() => {
-
-                var timeline = User.UserInstance.GetUserNicoRepo();
-
-                if(timeline == null) {
-
-                    IsEnd = true;
-                    IsActive = false;
-                    return;
-                }
-                foreach(var entry in timeline) {
-
-                    UserNicoRepoList.Add(new NicoRepoResultEntryViewModel(entry));
-                }
-
-                IsActive = false;
-            });
-        }
-
-        public void Open() {
-
-
-            //not existsの時など
-            if(SelectedItem == null || SelectedItem.Entry.VideoUrl == null) {
-
-                SelectedItem = null;
-                return;
+                Reflesh();
             }
 
-            NicoNicoOpener.Open(SelectedItem.Entry.VideoUrl);
-
-            SelectedItem = null;
         }
 
-
-
     }
-    class UserMylistViewModel : TabItemViewModel {
 
-        public UserMylistViewModel() : base("マイリスト") { }
-    }
-    class UserVideoViewModel : TabItemViewModel {
-
-        public UserVideoViewModel() : base("投稿") { }
-    }
+    
 
 }

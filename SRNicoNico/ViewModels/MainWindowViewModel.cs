@@ -72,7 +72,23 @@ namespace SRNicoNico.ViewModels {
             RaisePropertyChanged("UserSelectedFont");
         }
 
-        
+
+        #region Visibility変更通知プロパティ
+        private Visibility _Visibility;
+
+        public Visibility Visibility {
+            get { return _Visibility; }
+            set { 
+                if(_Visibility == value)
+                    return;
+                _Visibility = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
+
+
         public NicoNicoUserEntry User { get; private set; }
 
         public SignInViewModel SignIn { get; private set; }
@@ -223,7 +239,7 @@ namespace SRNicoNico.ViewModels {
 
         public void KeyDown(KeyEventArgs e) {
 
-            SelectedTab.KeyDown(e);
+            SelectedTab?.KeyDown(e);
         }
 
         public void SearchText(SearchType type, string text) {

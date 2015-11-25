@@ -163,10 +163,32 @@ namespace SRNicoNico.ViewModels {
                 if(_Volume == value)
                     return;
                 _Volume = value;
+                ChangeVolume(value);
+                Console.WriteLine(value);
+                RaisePropertyChanged();
+                if(value != 0) {
+
+                    IsMute = false;
+                }
+            }
+        }
+        #endregion
+
+
+        #region IsMute変更通知プロパティ
+        private bool _IsMute;
+
+        public bool IsMute {
+            get { return _IsMute; }
+            set { 
+                if(_IsMute == value)
+                    return;
+                _IsMute = value;
                 RaisePropertyChanged();
             }
         }
         #endregion
+
 
         #region VideoFlash変更通知プロパティ UI要素だけどこればっかりは仕方ない
         private VideoFlash _VideoFlash;
@@ -415,16 +437,20 @@ namespace SRNicoNico.ViewModels {
             InvokeScript("JsToggleComment");
         }
 
+        private int PrevVolume;
+
         public void ToggleMute() {
 
-            if(Volume == 0) {
+            IsMute ^= true;
+            if(IsMute) {
 
-                Volume = 100;
+                PrevVolume = Volume;
+                Volume = 0;
             } else {
 
-                Volume = 0;
+                Volume = PrevVolume;
             }
-            ChangeVolume(Volume);
+
         }
 
         //フルスクリーンにする
@@ -438,13 +464,15 @@ namespace SRNicoNico.ViewModels {
 
             //リソースに登録
             Application.Current.Resources["VideoFlashKey"] = VideoFlash;
-            var message = new TransitionMessage(typeof(FullScreenWindow), this, TransitionMode.Modal);
+            var message = new TransitionMessage(typeof(FullScreenWindow), this, TransitionMode.NewOrActive);
 
             //ウィンドウからFlash部分を消去
             Video.Grid.Children.Remove(VideoFlash);
 
+            App.ViewModelRoot.Visibility = Visibility.Hidden;
             //フルスクリーンウィンドウ表示
             Messenger.Raise(message);
+
         }
 
         //ウィンドウモードに戻す
@@ -462,6 +490,7 @@ namespace SRNicoNico.ViewModels {
 
             //ウィンドウを閉じる
             FullScreenWindow.Close();
+            App.ViewModelRoot.Visibility = Visibility.Visible;
 
             //ウィンドウにFlash部分を追加
             Video.Grid.Children.Add(VideoFlash);
@@ -677,6 +706,7 @@ namespace SRNicoNico.ViewModels {
             Dispose();
         }
 
+
         public override void KeyDown(KeyEventArgs e) {
 
             if(IsFullScreen) {
@@ -688,7 +718,7 @@ namespace SRNicoNico.ViewModels {
                     case Key.Escape:
                         ToggleFullScreen();
                         break;
-                    case Key.Back:
+                    case Key.S:
                         Restart();
                         break;
                     case Key.C:
@@ -710,7 +740,7 @@ namespace SRNicoNico.ViewModels {
                     case Key.F:
                         ToggleFullScreen();
                         break;
-                    case Key.Back:
+                    case Key.S:
                         Restart();
                         break;
                     case Key.C:
