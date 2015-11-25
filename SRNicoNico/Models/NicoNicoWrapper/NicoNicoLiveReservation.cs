@@ -48,6 +48,7 @@ namespace SRNicoNico.Models.NicoNicoWrapper
                 NicoNicoLiveReservationData data = new NicoNicoLiveReservationData();
                 data.Id = "lv" + entry.vid;
                 data.Title = entry.title;
+
                 if (entry.status == "FIRST_WATCH") {
                     data.State = "視聴権を利用する";
                 } else if (entry.status == "WATCH") {
@@ -60,16 +61,14 @@ namespace SRNicoNico.Models.NicoNicoWrapper
                     data.State = entry.status;
                 }
 
-                if (entry.unwatch == "1") {
-                    data.Unwatch = true;
-                } else
-                {
-                    data.Unwatch = false;
-                }
+                data.Unwatch = (entry.unwatch == "1");
 
                 if (entry.expire != "0")
                 {
                     data.ExpireDate = NicoNicoUtil.GetTimeFromLong(long.Parse(entry.expire));
+                } else
+                {
+                    data.ExpireDate = "";
                 }
 
                 if (vitaLives.ContainsKey(data.Id))
@@ -79,8 +78,6 @@ namespace SRNicoNico.Models.NicoNicoWrapper
 
                 ret.Add(data);
             }
-
-            
 
             Reservation.Status = "生放送予約リスト取得完了";
 

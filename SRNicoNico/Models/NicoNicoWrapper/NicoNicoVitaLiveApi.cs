@@ -57,7 +57,14 @@ namespace SRNicoNico.Models.NicoNicoWrapper
                 r.ChannelThumbnailUrl = response.community.thumbnail;
                 r.ChannelThumbnailSmallUrl = response.community.thumbnail_small;
             }
-            //r.LockedTags = response.livetags.locked.livetag;
+            /*
+            List<string> lockedTags = new List<string>();
+            foreach(var tag in response.livetags.locked.livetag)
+            {
+                lockedTags.Add(tag);
+            }
+            r.LockedTags = lockedTags;
+            */
             //r.CurrentStatus = response.video._currentstatus;
             r.PictureUrl = response.video._picture_url;
             r.ThumbnailUrl = response.video._thumbnail_url;
@@ -69,20 +76,20 @@ namespace SRNicoNico.Models.NicoNicoWrapper
             //r.TsReservedCount = int.Parse(response.video._ts_reserved_count);
             //r.TsViewLimitNum = int.Parse(response.video._ts_view_limit_num);
             //r.UseTsArchive = response.video._use_tsarchive == "1" ? true : false;
-            r.ChannelOnly = response.video.channel_only == "1" ? true : false;
+            r.ChannelOnly = (response.video.channel_only == "1");
             r.CommentCount = int.Parse(response.video.comment_count);
-            r.CommunityOnly = response.video.community_only == "1" ? true : false;
+            r.CommunityOnly = (response.video.community_only == "1");
             r.Description = response.video.description() ? response.video.description : "";
             r.EndTime = NicoNicoUtil.DateFromVitaFormatDate(response.video.end_time);
-            r.HidescoreComment = response.video.hidescore_comment == "1" ? true : false;
-            r.HidescoreOnline = response.video.hidescore_online == "1" ? true : false;
+            r.HidescoreComment = (response.video.hidescore_comment == "1");
+            r.HidescoreOnline = (response.video.hidescore_online == "1");
             r.Id = response.video.id;
-            r.IsHq = response.video.is_hq == "1" ? true : false;
+            r.IsHq = (response.video.is_hq == "1");
             r.OpenTime = NicoNicoUtil.DateFromVitaFormatDate(response.video.open_time);
             r.ProviderType = response.video.provider_type;
             r.RelatedChannelId = response.video.related_channel_id;
             r.StartTime = NicoNicoUtil.DateFromVitaFormatDate(response.video.start_time);
-            r.TimeshiftEnbled = response.video.timeshift_enabled == "1" ? true : false;
+            r.TimeshiftEnbled = (response.video.timeshift_enabled == "1");
             r.Title = response.video.title;
             //r.UserId = response.video.user_id;
             r.ViewCount = int.Parse(response.video.view_counter);
@@ -111,7 +118,7 @@ namespace SRNicoNico.Models.NicoNicoWrapper
         public string ChannelThumbnailSmallUrl { get; set; }
 
         //タグ
-        public string[] LockedTags { get; set; }
+        public List<string> LockedTags { get; set; }
 
         //放送中かどうかなど
         public string CurrentStatus { get; set; }

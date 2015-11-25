@@ -60,7 +60,6 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
             Page = 1;
         }
 
-
     }
 
     public class NicoNicoFavoriteUser {
