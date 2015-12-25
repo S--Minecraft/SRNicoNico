@@ -1,5 +1,4 @@
 ﻿using SRNicoNico.Models.NicoNicoViewer;
-using SRNicoNico.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +14,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SRNicoNico.Views.Contents.NicoRepo {
+namespace SRNicoNico.Views.Contents.PublicMylist {
     /// <summary>
-    /// NicoRepoResultEntry.xaml の相互作用ロジック
+    /// PublicMylist.xaml の相互作用ロジック
     /// </summary>
-    public partial class NicoRepoResultEntry : UserControl {
-        public NicoRepoResultEntry() {
+    public partial class PublicMylist : UserControl {
+        public PublicMylist() {
             InitializeComponent();
         }
 
@@ -29,6 +28,7 @@ namespace SRNicoNico.Views.Contents.NicoRepo {
 
             NicoNicoOpener.Open(e.Uri.OriginalString);
         }
+
         public void InitializeToolTip(object sender, RoutedEventArgs e) {
 
             var link = sender as Hyperlink;

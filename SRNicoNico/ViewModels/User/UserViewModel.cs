@@ -71,8 +71,7 @@ namespace SRNicoNico.ViewModels {
         public UserViewModel(string url) : base("読込中") {
 
             UserPageUrl = url;
-            App.ViewModelRoot.TabItems.Add(this);
-            App.ViewModelRoot.SelectedTab = this;
+            App.ViewModelRoot.AddTabAndSetCurrent(this);
 
             Initialize();
         }
@@ -98,7 +97,7 @@ namespace SRNicoNico.ViewModels {
 
         public void Close() {
 
-            App.ViewModelRoot.TabItems.Remove(this);
+            App.ViewModelRoot.RemoveTabAndLastSet(this);
         }
 
         public void Reflesh() {
@@ -112,7 +111,6 @@ namespace SRNicoNico.ViewModels {
         }
 
         public override void KeyDown(KeyEventArgs e) {
-    
 
             if(e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.W) {
 
@@ -121,7 +119,6 @@ namespace SRNicoNico.ViewModels {
 
                 Reflesh();
             }
-
         }
 
     }

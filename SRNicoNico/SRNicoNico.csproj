@@ -207,6 +207,7 @@
     <Compile Include="Models\NicoNicoWrapper\NicoNicoLiveReservation.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoMylist.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoMylistGroup.cs" />
+    <Compile Include="Models\NicoNicoWrapper\NicoNicoPublicMylist.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoVideo.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoVitaApi.cs" />
     <Compile Include="Models\NicoNicoWrapper\NicoNicoVitaLiveApi.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="ViewModels\Mylist\MylistListViewModel.cs" />
     <Compile Include="ViewModels\Mylist\MylistViewModel.cs" />
     <Compile Include="ViewModels\Mylist\NewMylistViewModel.cs" />
+    <Compile Include="ViewModels\Mylist\PublicMylistViewModel.cs" />
     <Compile Include="ViewModels\SignIn\TwitterSignInViewModel.cs" />
     <Compile Include="ViewModels\StartViewModel.cs" />
     <Compile Include="ViewModels\TabItemViewModel.cs" />
@@ -327,6 +329,9 @@
     </Compile>
     <Compile Include="Views\Contents\Reservation\ReservationResultEntry.xaml.cs">
       <DependentUpon>ReservationResultEntry.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Contents\PublicMylist\PublicMylist.xaml.cs">
+      <DependentUpon>PublicMylist.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Contents\SignIn\TwitterSignInDialog.xaml.cs">
       <DependentUpon>TwitterSignInDialog.xaml</DependentUpon>
@@ -563,6 +568,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Contents\PublicMylist\PublicMylist.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Contents\SignIn\TwitterSignInDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -765,7 +774,7 @@
 xcopy /Y  $(ProjectDir)Flash\bin\*.swf $(TargetDir)Flash
 xcopy /Y /Q /S /E $(ProjectDir)Html $(TargetDir)Flash</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

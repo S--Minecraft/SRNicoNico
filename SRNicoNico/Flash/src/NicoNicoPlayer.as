@@ -14,6 +14,7 @@ package  {
 	import flash.net.URLRequest;
 	import flash.system.fscommand;
 	import flash.ui.Keyboard;
+	import flash.ui.Mouse;
 	
 	[SWF(width="672", height="384")]
 	public class NicoNicoPlayer extends NicoNicoPlayerBase {
@@ -81,7 +82,6 @@ package  {
 					stream.step(1);
 				}
 			});*/
-			
 		}
 		
 		//指定したURLをストリーミング再生する
@@ -191,11 +191,11 @@ package  {
 			
 			//trace("Time:" + stream.time);
 			
-			if(prevTime != (int)(value)) {
+			//if(prevTime != (int)(value)) {
 				
 				fscommand("CsFrame", value + ":" + buffer.toString() + ":" + (stream.bytesLoaded - prevLoaded).toString());
 				prevLoaded = stream.bytesLoaded;
-			}
+			//}
 			prevTime = (int) (value);
 			
 			var vpos:Number = Math.floor(value * 100);

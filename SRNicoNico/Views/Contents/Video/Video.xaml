@@ -34,11 +34,11 @@
                                 <ControlTemplate TargetType="ContentControl">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="300"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <local:VideoInfo Margin="10"/>
+                                        <local:VideoInfo />
                                         <local:VideoContent Grid.Column="1"/>
                                     </Grid>
                                 </ControlTemplate>
@@ -51,12 +51,12 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="300"/>
             </Grid.ColumnDefinitions>
 
             <local:VideoContent />
 
-            <local:VideoInfo Grid.Column="1" Margin="10"/>
+            <local:VideoInfo Grid.Column="1" />
         </Grid>
     </ContentControl>
 

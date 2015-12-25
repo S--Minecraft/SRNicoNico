@@ -13,19 +13,34 @@ using Livet.EventListeners;
 using Livet.Messaging.Windows;
 
 using SRNicoNico.Models.NicoNicoWrapper;
-using System.Collections.ObjectModel;
-
-using GongSolutions.Wpf.DragDrop;
+using System.Windows.Input;
 
 namespace SRNicoNico.ViewModels {
-    public class MylistListViewModel : TabItemViewModel, IDragSource  {
+    public class PublicMylistViewModel : TabItemViewModel {
+
+        private NicoNicoPublicMylist PublicMylist;
+
+
+        #region MylistData変更通知プロパティ
+        private NicoNicoPublicMylistEntry _MylistData;
+
+        public NicoNicoPublicMylistEntry MylistData {
+            get { return _MylistData; }
+            set { 
+                if(_MylistData == value)
+                    return;
+                _MylistData = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
 
         #region Mylist変更通知プロパティ
         private DispatcherCollection<MylistListEntryViewModel> _Mylist;
 
         public DispatcherCollection<MylistListEntryViewModel> Mylist {
             get { return _Mylist; }
-            set { 
+            set {
                 if(_Mylist == value)
                     return;
                 _Mylist = value;
@@ -54,7 +69,7 @@ namespace SRNicoNico.ViewModels {
 
         public int SortIndex {
             get { return _SortIndex; }
-            set { 
+            set {
                 if(_SortIndex == value)
                     return;
                 _SortIndex = value;
@@ -65,78 +80,25 @@ namespace SRNicoNico.ViewModels {
         #endregion
 
 
-        #region EditMode変更通知プロパティ
-        private bool _EditMode;
+        private string MylistId;
 
-        public bool EditMode {
-            get { return _EditMode; }
-            set { 
-                if(_EditMode == value)
-                    return;
-                _EditMode = value;
-                if(value) {
+        public PublicMylistViewModel(string url) : base("読込中") {
 
-                    Group.BeforeName = Group.Name;
-                    Group.BeforeDescription = Group.Description;
-                }
-                RaisePropertyChanged();
-            }
+            MylistId = url.Substring(31);
+            PublicMylist = new NicoNicoPublicMylist(url);
+
+            App.ViewModelRoot.TabItems.Add(this);
+            App.ViewModelRoot.SelectedTab = this;
         }
-        #endregion
-
-        //リスト情報
-        public NicoNicoMylistGroupData Group { get; private set; }
-
-        //オーナー
-        public MylistViewModel Owner { get; private set; }
-
-        //エディットモード時
-        public MylistEditModeViewModel EditModeViewModel { get; set; }
-
-        public MylistListViewModel(MylistViewModel vm, NicoNicoMylistGroupData group, List<NicoNicoMylistData> list) : base(group.Name) {
-
-            EditModeViewModel = new MylistEditModeViewModel(this);
-            Owner = vm;
-            Group = group;
-            Mylist = new DispatcherCollection<MylistListEntryViewModel>(DispatcherHelper.UIDispatcher);
-            foreach(NicoNicoMylistData data in list) {
-
-                Mylist.Add(new MylistListEntryViewModel(this, data));
-            }
-            Sort(0);
-
-        }
-
-        /*
-            <ComboBoxItem Content="登録が新しい順" />
-            <ComboBoxItem Content="登録が古い順" />
-            <ComboBoxItem Content="タイトル昇順" />
-            <ComboBoxItem Content="タイトル降順" />
-            <ComboBoxItem Content="マイリストコメント昇順" />
-            <ComboBoxItem Content="マイリストコメント降順" />
-            <ComboBoxItem Content="投稿が新しい順" />
-            <ComboBoxItem Content="投稿が古い順" />
-            <ComboBoxItem Content="再生数が多い順" />
-            <ComboBoxItem Content="再生数が少ない順" />
-            <ComboBoxItem Content="コメントが新しい順" />
-            <ComboBoxItem Content="コメントが古い順" />
-            <ComboBoxItem Content="コメントが多い順" />
-            <ComboBoxItem Content="コメントが少ない順" />
-            <ComboBoxItem Content="マイリスト登録が多い順" />
-            <ComboBoxItem Content="マイリスト登録が少ない順" />
-        */
-        //ソート
         public void Sort(int index) {
 
             IOrderedEnumerable<MylistListEntryViewModel> sorted = null;
-
             if(Mylist == null) {
 
                 return;
             }
-
             var tmp = Mylist.ToArray();
-            
+
             //並び替え
             switch(index) {
                 case 0:
@@ -199,6 +161,27 @@ namespace SRNicoNico.ViewModels {
             }
         }
 
+        public void OpenBrowser() {
+
+            System.Diagnostics.Process.Start("http://www.nicovideo.jp/mylist/" + MylistId);
+        }
+
+        public void Initialize() {
+
+            Task.Run(() => {
+
+                MylistData = PublicMylist.GetMylist();
+                Name = MylistData.MylistName;
+                Mylist = new DispatcherCollection<MylistListEntryViewModel>(DispatcherHelper.UIDispatcher);
+
+                foreach(var entry in MylistData.Data) {
+
+                    Mylist.Add(entry);
+                }
+                Sort(SortIndex);
+
+            });
+        }
         //選択したマイリストを開く
         public void Open() {
 
@@ -221,67 +204,25 @@ namespace SRNicoNico.ViewModels {
             }
         }
 
-        //更新
+        public void Close() {
+
+            App.ViewModelRoot.RemoveTabAndLastSet(this);
+        }
         public void Reflesh() {
 
-            IsActive = true;
-
-            Task.Run(() => {
-
-                Mylist.Clear();
-
-                foreach(var data in MylistViewModel.MylistInstance.GetMylist(Group.Id)) {
-
-                    Mylist.Add(new MylistListEntryViewModel(this, data));
-                }
-
-                //エディットモードの情報をクリア
-                EditModeViewModel.AllSelect = false;
-                EditModeViewModel.IsAnyoneChecked = false;
-                IsActive = false;
-            });
+            Initialize();
         }
 
-        //マイリスト削除ダイアログ表示
-        public void ShowDeleteDialog() {
+        public override void KeyDown(KeyEventArgs e) {
 
-            App.ViewModelRoot.Messenger.Raise(new TransitionMessage(typeof(Views.Contents.Mylist.DeleteMylistDialog), this, TransitionMode.Modal));
-        }
+            if(e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.W) {
 
-        //マイリスト削除
-        public void DeleteMylist() {
-            
-            Owner.Status = Group.Name + " を削除しています";
-            Task.Run(() => {
+                Close();
+            } else if(e.Key == Key.F5) {
 
-                MylistViewModel.MylistGroupInstance.DeleteMylistGroup(Group.Id);
-                CloseDialog();
-                Owner.Reflesh();
-                Owner.Status = Group.Name + " を削除しました";
+                Reflesh();
+            }
 
-            });
-        }
-
-        //ドラッグ開始
-        void IDragSource.StartDrag(IDragInfo dragInfo) {
-
-            dragInfo.Data = SelectedItem;
-            dragInfo.Effects = System.Windows.DragDropEffects.All;
-        }
-
-        bool IDragSource.CanStartDrag(IDragInfo dragInfo) {
-
-            return true;
-        }
-
-        void IDragSource.Dropped(IDropInfo dropInfo) {
-
-        }
-
-        void IDragSource.DragCancelled() {
-
-            SelectedItem = null;
-            Owner.Status = "";
         }
     }
 }

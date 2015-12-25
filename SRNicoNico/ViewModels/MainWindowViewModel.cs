@@ -172,8 +172,6 @@ namespace SRNicoNico.ViewModels {
 			//Modelsを初期化
 			Task.Run(() => {
 
-
-
 				if(File.Exists(NicoNicoUtil.CurrentDirectory.DirectoryName + @"\session")) {
 
                     StatusBar.Status = "自動ログイン中";
@@ -190,8 +188,8 @@ namespace SRNicoNico.ViewModels {
 					if(DateTimeOffset.Compare(expire, DateTimeOffset.Now) < 0) {
 
 						//セッションが有効期限切れ
-						this.SignIn.StateText = "有効期限が切れています。\n再度ログインしてください。";
-						this.SignIn.AutoLogin = true;
+						SignIn.StateText = "有効期限が切れています。\n再度ログインしてください。";
+						SignIn.AutoLogin = true;
 
 						//ログインダイアログ表示
 						Messenger.Raise(new TransitionMessage(typeof(SignInDialog), this.SignIn, TransitionMode.Modal));
@@ -201,10 +199,10 @@ namespace SRNicoNico.ViewModels {
 					//セッションが有効だった場合
 					NicoNicoWrapperMain.Instance = new NicoNicoWrapperMain(new NicoNicoSession(key, expire));
 					if(NicoNicoWrapperMain.Session.SignInInternal() != SigninStatus.Success) {
-
+                   
 						//ログイン失敗
-						this.SignIn.StateText = "ログインに失敗しました。";
-						this.SignIn.AutoLogin = true;
+						SignIn.StateText = "ログインに失敗しました。";
+						SignIn.AutoLogin = true;
 
 						//ログインダイアログ表示
 						Messenger.Raise(new TransitionMessage(typeof(SignInDialog), SignIn, TransitionMode.Modal));
@@ -251,6 +249,17 @@ namespace SRNicoNico.ViewModels {
 
         }
 
+        public void RemoveTabAndLastSet(TabItemViewModel vm) {
+
+            TabItems.Remove(vm);
+            SelectedTab = App.ViewModelRoot.TabItems.Last();
+        }
+
+        public void AddTabAndSetCurrent(TabItemViewModel vm) {
+
+            TabItems.Add(vm);
+            SelectedTab = vm;
+        }
 
     }
 }

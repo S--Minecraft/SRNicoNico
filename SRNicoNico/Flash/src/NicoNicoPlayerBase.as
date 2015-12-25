@@ -2,9 +2,13 @@ package {
 	import flash.display.Sprite;
 	import flash.display.StageScaleMode;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.events.NetStatusEvent;
+	import flash.events.TimerEvent;
 	import flash.external.ExternalInterface;
 	import flash.system.fscommand;
+	import flash.ui.Mouse;
+	import flash.utils.Timer;
 	
 	import comment.CommentRasterizer;
 	
@@ -57,7 +61,54 @@ package {
 			InjectComment(loader.data);
 			});
 			loader.load(req);*/
+			timer = new Timer(1200);
+			timer.addEventListener(TimerEvent.TIMER, tick);
+			timer.start();
+			
+			
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, move);
 		}
+		
+		private var timer:Timer;
+		private var isRollOver:Boolean;
+		
+		private function move(e:MouseEvent):void {
+			
+			timer.reset();
+			timer.start();
+			
+			isRollOver = true;
+			Mouse.show();
+			fscommand("ShowContoller");
+		
+			if (!stage.hasEventListener(Event.MOUSE_LEAVE)) {
+
+				stage.addEventListener(Event.MOUSE_LEAVE, leave);
+			}
+		}
+		
+		private function leave(e:Event):void {
+		
+			isRollOver = false;
+			stage.removeEventListener(Event.MOUSE_LEAVE, leave);
+		}
+		
+		private function tick(e:TimerEvent):void {
+			
+			if (isRollOver) {
+			
+				Mouse.hide();
+				fscommand("HideContoller");
+			}
+			
+		}
+		
+		
+		
+		
+		
+		
+		
 		
 		//指定したURLをストリーミング再生する オーバーライドして使う
 		public function OpenVideo(videoUrl:String):void {}
@@ -90,6 +141,7 @@ package {
 			}
 		}
 		public function ChangeVolume(vol:Number):void {}		
+		
 		
 	}
 }

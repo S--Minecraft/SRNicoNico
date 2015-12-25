@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Web;
 using System;
-
+using System.Linq;
 using Livet;
 
 using SRNicoNico.Models.NicoNicoViewer;
@@ -236,8 +236,27 @@ namespace SRNicoNico.ViewModels {
 
                 return App.ViewModelRoot.Config.Video.VideoPlacement;
             }
-            set { }
+            set {
+
+                RaisePropertyChanged();
+            }
         }
+
+
+        #region SplitterHeight変更通知プロパティ
+
+        public GridLength SplitterHeight {
+            get { return Properties.Settings.Default.SplitterHeight; }
+            set { 
+                if(Properties.Settings.Default.SplitterHeight.Value == value.Value)
+                    return;
+                Properties.Settings.Default.SplitterHeight = value;
+                Properties.Settings.Default.Save();
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
 
         #region VideoUrl変更通知プロパティ
         private string _VideoUrl;
@@ -252,6 +271,22 @@ namespace SRNicoNico.ViewModels {
             }
         }
         #endregion
+
+
+        #region LoadFailed変更通知プロパティ
+        private bool _LoadFailed;
+
+        public bool LoadFailed {
+            get { return _LoadFailed; }
+            set { 
+                if(_LoadFailed == value)
+                    return;
+                _LoadFailed = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
 
         public VideoMylistViewModel Mylist { get; set; }
 
@@ -271,12 +306,27 @@ namespace SRNicoNico.ViewModels {
         #endregion
 
 
+        #region FullScreenPopup変更通知プロパティ
+        private bool _FullScreenPopup = true;
+
+        public bool FullScreenPopup {
+            get { return _FullScreenPopup; }
+            set { 
+                if(_FullScreenPopup == value)
+                    return;
+                _FullScreenPopup = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
+
         public VideoViewModel(string videoUrl) : base(videoUrl.Substring(30)) {
 
-            VideoUrl = videoUrl;
+            VideoUrl = videoUrl + "?watch_harmful=1";
             Cmsid = Name;
-            App.ViewModelRoot.TabItems.Add(this);
-            App.ViewModelRoot.SelectedTab = this;
+
+            App.ViewModelRoot.AddTabAndSetCurrent(this);
             Initialize(videoUrl);
         }
 
@@ -293,9 +343,19 @@ namespace SRNicoNico.ViewModels {
                 //動画情報取得
                 VideoData.ApiData = NicoNicoWatchApi.GetWatchApiData(videoUrl);
 
+                //ロードに失敗したら
+                if(VideoData.ApiData == null) {
+
+                    LoadFailed = true;
+                    IsActive = false;
+                    Status = "動画の読み込みに失敗しました。";
+                    return;
+                }
+
+                //有料動画なら
                 if(VideoData.ApiData.IsPaidVideo) {
 
-                    App.ViewModelRoot.Messenger.Raise(new TransitionMessage(typeof(Views.Contents.Video.PaidVideoDialog), this, TransitionMode.Modal));
+                    App.ViewModelRoot.Messenger.Raise(new TransitionMessage(typeof(PaidVideoDialog), this, TransitionMode.Modal));
                     return;
                 }
 
@@ -334,7 +394,7 @@ namespace SRNicoNico.ViewModels {
                 Time = new VideoTime();
 
                 //動画時間
-                Time.VideoTimeString = NicoNicoUtil.GetTimeFromLong(VideoData.ApiData.Length);
+                Time.VideoTimeString = NicoNicoUtil.ConvertTime(VideoData.ApiData.Length);
 
 
                 if(VideoData.ApiData.GetFlv.IsPremium && !VideoData.ApiData.GetFlv.VideoUrl.StartsWith("rtmp")) {
@@ -353,11 +413,11 @@ namespace SRNicoNico.ViewModels {
 
                 List<NicoNicoCommentEntry> list = comment.GetComment();
 
-
+                
                 if(list != null) {
 
                     foreach(NicoNicoCommentEntry entry in list) {
-
+                            
                         VideoData.CommentData.Add(new CommentEntryViewModel(entry));
                     }
 
@@ -378,8 +438,7 @@ namespace SRNicoNico.ViewModels {
             });
         }
 
-        public void OpenBrowser()
-        {
+        public void OpenBrowser() {
 
             System.Diagnostics.Process.Start(VideoUrl);
         }
@@ -523,30 +582,35 @@ namespace SRNicoNico.ViewModels {
             }
 
         }
-
+        
         //最初から
         public void Restart() {
 
             Seek(0);
         }
 
+        private int prevTime;
+
         //1フレーム毎に呼ばれる
         public void CsFrame(float time, float buffer, long bps) {
 
 
-            double vpos = time * 100;
-            vpos = Math.Floor(vpos);
 
-            double comp = bps / 1024;
+            if(prevTime != (int)time) {
 
-            //大きいから単位を変えましょう
-            if(comp > 1024) {
+                double comp = bps / 1024;
 
-                BPS = Math.Floor((comp / 1024) * 100) / 100 + "MiB/秒";
-            } else {
+                //大きいから単位を変えましょう
+                if(comp > 1024) {
 
-                BPS = Math.Floor(comp * 100) / 100 + "KiB/秒";
+                    BPS = Math.Floor((comp / 1024) * 100) / 100 + "MiB/秒";
+                } else {
+
+                    BPS = Math.Floor(comp * 100) / 100 + "KiB/秒";
+                }
             }
+            prevTime = (int)time;
+           
 
 
             Time.BufferedTime = buffer;
@@ -555,8 +619,8 @@ namespace SRNicoNico.ViewModels {
 
             SetSeekCursor(time);
 
-            if((int)time == VideoData.ApiData.Length - 1) {
-
+            if((int)time == VideoData.ApiData.Length) {
+                
                 if(IsRepeat) {
 
                     Seek(0);
@@ -576,7 +640,7 @@ namespace SRNicoNico.ViewModels {
         private void SetSeekCursor(float time) {
 
             Time.CurrentTime = (int)time;
-            Time.CurrentTimeString = NicoNicoUtil.GetTimeFromLong(Time.CurrentTime);
+            Time.CurrentTimeString = NicoNicoUtil.ConvertTime(Time.CurrentTime);
         }
 
         //このメソッド以降はWebBrowserプロパティはnullではない
@@ -675,7 +739,6 @@ namespace SRNicoNico.ViewModels {
             return cur + "./Flash/NicoNicoNMPlayer.html";
         }
 
-
         private string GetRTMPPlayerPath() {
 
             var cur = System.IO.Directory.GetCurrentDirectory();
@@ -685,7 +748,7 @@ namespace SRNicoNico.ViewModels {
         //RTMP動画でタイムアウトになった時又は予期せぬ理由でエラーになった時
         public void RTMPTimeOut() {
 
-            App.ViewModelRoot.Messenger.Raise(new TransitionMessage(typeof(Views.Contents.Video.VideoTimeOutDialog), this, TransitionMode.Modal));
+            App.ViewModelRoot.Messenger.Raise(new TransitionMessage(typeof(VideoTimeOutDialog), this, TransitionMode.Modal));
         }
         
 
@@ -701,14 +764,15 @@ namespace SRNicoNico.ViewModels {
             WebBrowser.Dispose();
             WebBrowser.IsEnabled = false;
 
-            App.ViewModelRoot.TabItems.Remove(this);
-
+            App.ViewModelRoot.RemoveTabAndLastSet(this);
             Dispose();
         }
 
 
         public override void KeyDown(KeyEventArgs e) {
 
+            Console.WriteLine("KeyDown:" + e.Key);
+            Console.Out.Flush();
             if(IsFullScreen) {
 
                 switch(e.Key) {
@@ -765,7 +829,40 @@ namespace SRNicoNico.ViewModels {
                 }
             }
         }
+       
+        public void ToggleFavorite() {
 
+            Task.Run(() => {
+
+
+                if(!VideoData.ApiData.UploaderIsFavorited) {
+
+                    var status = NicoNicoWatchApi.AddFavorite(this, VideoData.ApiData.UploaderId, VideoData.ApiData.Token);
+                    if(status == Models.NicoNicoWrapper.Status.Success) {
+
+                        VideoData.ApiData.UploaderIsFavorited = true;
+                    }
+                } else {
+
+                    var status = NicoNicoWatchApi.DeleteFavorite(this, VideoData.ApiData.UploaderId, VideoData.ApiData.Token);
+                    if(status == Models.NicoNicoWrapper.Status.Success) {
+
+                        VideoData.ApiData.UploaderIsFavorited = false;
+                    }
+                }
+
+            });
+        }
+
+        public void HideFullScreenPopup() {
+
+            FullScreenPopup = false;
+        }
+
+        public void ShowFullScreenPopup() {
+
+            FullScreenPopup = true;
+        }
 
     }
 }

@@ -25,16 +25,21 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
 
             NicoNicoVitaApiVideoData ret = new NicoNicoVitaApiVideoData();
 
+            if(!response.video()) {
+
+                ret.Success = false;
+                return ret;
+            }
+
             ret.Id = response.video.id;
             ret.Title = response.video.title;
             ret.FirstRetrieve = NicoNicoUtil.DateFromVitaFormatDate(response.video.first_retrieve);
             ret.ViewCounter = int.Parse(response.video.view_counter);
             ret.CommentCounter = int.Parse(response.thread.num_res);
             ret.MylistCounter = int.Parse(response.video.mylist_counter);
-            ret.Length = NicoNicoUtil.GetTimeFromLong(long.Parse(response.video.length_in_seconds));
+            ret.Length = NicoNicoUtil.ConvertTime(long.Parse(response.video.length_in_seconds));
             ret.Description = response.video.description;
             ret.ThumbnailUrl = response.video.thumbnail_url;
-            
             return ret;
         }
     }
@@ -67,6 +72,9 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
 
         //サムネイル
         public string ThumbnailUrl { get; set; }
+
+        //成功したか否か
+        public bool Success { get; set; } = true;
 
     }
 

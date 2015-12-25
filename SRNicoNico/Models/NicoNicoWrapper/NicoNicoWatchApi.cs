@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using SRNicoNico.ViewModels;
 using SRNicoNico.Models.NicoNicoViewer;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SRNicoNico.Models.NicoNicoWrapper {
 
@@ -29,7 +30,7 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
         public static WatchApiData GetWatchApiData(string videoPage) {
 
             //動画ページのhtml取得
-            HttpResponseMessage response = NicoNicoWrapperMain.GetSession().GetResponseAsync(videoPage).Result;
+            var response = NicoNicoWrapperMain.GetSession().GetResponseAsync(videoPage).Result;
 
             //チャンネル、公式動画
             if(response.StatusCode == HttpStatusCode.MovedPermanently) {
@@ -53,26 +54,33 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
             doc.LoadHtml2(html);
 
             //htmlからAPIデータだけを綺麗に抜き出す すごい
-            string data = doc.DocumentNode.QuerySelector("#watchAPIDataContainer").InnerHtml;
+            var container = doc.DocumentNode.QuerySelector("#watchAPIDataContainer");
+
+            if(container == null) {
+
+                return null;
+            }
+
+            var data = container.InnerHtml;
 
             //html特殊文字をデコードする
-            data = System.Web.HttpUtility.HtmlDecode(data);
+            data = HttpUtility.HtmlDecode(data);
 
             //jsonとしてAPIデータを展開していく
             var json = DynamicJson.Parse(data);
 
             //GetFlvの結果
-            string flv = json.flashvars.flvInfo;
+             string flv = json.flashvars.flvInfo;
 
             //2重にエンコードされてるので二回
-            flv = System.Web.HttpUtility.UrlDecode(flv);
-            flv = System.Web.HttpUtility.UrlDecode(flv);
+            flv = HttpUtility.UrlDecode(flv);
+            flv = HttpUtility.UrlDecode(flv);
 
 
             WatchApiData ret = new WatchApiData();
 
             //&で繋がれているので剥がす
-            Dictionary<string, string> getFlv = flv.Split(new char[] { '&' }).ToDictionary(source => source.Substring(0, source.IndexOf('=')),
+            var getFlv = flv.Split(new char[] { '&' }).ToDictionary(source => source.Substring(0, source.IndexOf('=')),
             source => Uri.UnescapeDataString(source.Substring(source.IndexOf('=') + 1)));
 
             ret.GetFlv = new NicoNicoGetFlvData(getFlv);
@@ -95,11 +103,29 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
             ret.HighestRank = videoDetail.highest_rank == null ? "圏外" : videoDetail.highest_rank + "位";
             ret.Token = json.flashvars.csrfToken;
 
-            //フォントサイズが1だと異様に小さいので補正
-            if(ret.Description.Contains("<font size=\"1\"")) {
+            if(json.uploaderInfo()) {
 
-                ret.Description = ret.Description.Replace("<font size=\"1\"","<font size=\"2.6\"");
+                //投稿者情報
+                var uploaderInfo = json.uploaderInfo;
+
+                ret.UploaderId = uploaderInfo.id;
+                ret.UploaderIconUrl = uploaderInfo.icon_url;
+                ret.UploaderName = uploaderInfo.nickname;
+                ret.UploaderIsFavorited = uploaderInfo.is_favorited;
+
+            } else if(json.channelInfo()) {
+
+                //投稿者情報
+                var channelInfo = json.channelInfo;
+
+                ret.UploaderId = channelInfo.id;
+                ret.UploaderIconUrl = channelInfo.icon_url;
+                ret.UploaderName = channelInfo.name;
+                ret.UploaderIsFavorited = channelInfo.is_favorited == 1 ? true : false;
+
+                ret.IsChannelVideo = true;
             }
+
 
             ret.Description = HyperLinkParser.Parse(ret.Description);
 
@@ -136,6 +162,73 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
                 }
             }
             return ret;
+        }
+
+        public static Status AddFavorite(VideoViewModel vm, string userId, string token) {
+
+            vm.Status = "お気に入りに登録中";
+
+
+            var add = "http://www.nicovideo.jp/api/watchitem/add";
+
+            var formData = new Dictionary<string, string>();
+
+            formData["item_type"] = "1";
+            formData["item_id"] = userId;
+            formData["token"] = token;
+            try {
+
+                var request = new HttpRequestMessage(HttpMethod.Post, add);
+
+                request.Content = new FormUrlEncodedContent(formData);
+
+
+                var a = NicoNicoWrapperMain.Session.GetAsync(request).Result;
+
+                vm.VideoData.ApiData.UploaderIsFavorited = true;
+
+                vm.Status = "";
+
+                return Status.Success;
+            } catch(RequestTimeout) {
+
+                vm.Status = "お気に入り登録に失敗しました。";
+                return Status.Failed;
+            }
+            
+
+        }
+
+        public static Status DeleteFavorite(VideoViewModel vm, string userId, string token) {
+
+            vm.Status = "お気に入り解除中";
+            
+
+            var del = "http://www.nicovideo.jp/api/watchitem/delete";
+
+            var formData = new Dictionary<string, string>();
+
+            formData["id_list[1][]"] = userId;
+            formData["token"] = token;
+
+            try {
+
+                var request = new HttpRequestMessage(HttpMethod.Post, del);
+
+                request.Content = new FormUrlEncodedContent(formData);
+
+                var a = NicoNicoWrapperMain.Session.GetAsync(request).Result;
+
+                vm.VideoData.ApiData.UploaderIsFavorited = false;
+                vm.Status = "";
+
+                return Status.Success;
+
+            } catch(RequestTimeout) {
+
+                vm.Status = "お気に入り解除に失敗しました。";
+                return Status.Failed;
+            }
         }
     }
 
@@ -201,6 +294,33 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
         }
         #endregion
 
+        //うｐ主又はチャンネルのID
+        public string UploaderId { get; set; }
+
+        //うｐ主又はチャンネルアイコンURL
+        public string UploaderIconUrl { get; set; }
+
+        //うｐ主又はチャンネルの名前
+        public string UploaderName { get; set; }
+
+        //うｐ主又はチャンネルをお気に入り登録しているかどうか
+        #region UploaderIsFavorited変更通知プロパティ
+        private bool _UploaderIsFavorited;
+
+        public bool UploaderIsFavorited {
+            get { return _UploaderIsFavorited; }
+            set { 
+                if(_UploaderIsFavorited == value)
+                    return;
+                _UploaderIsFavorited = value;
+                RaisePropertyChanged();
+            }
+        }
+        #endregion
+
+
+        //チャンネル動画か否か
+        public bool IsChannelVideo { get; set; }
     }
 
     //タグ情報
@@ -273,6 +393,12 @@ namespace SRNicoNico.Models.NicoNicoWrapper {
         FLV,
         SWF,
         RTMP
+    }
+
+    public enum Status {
+
+        Success,
+        Failed
     }
 
 }
